@@ -11,6 +11,10 @@ public class Totp extends HotpGenerator {
 		super(secret, hashAlgorithm, length);
 	}
 
+	public Totp (String extra) throws CodeGeneratorConstructionException {
+		super(extra);
+	}
+
 	@Override
 	public String generateCode() {
 		// Convert the time in milliseconds to the number of 30s intervals since the epoch

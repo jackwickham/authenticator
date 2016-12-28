@@ -3,9 +3,6 @@ package net.jackw.authenticator;
 import java.nio.ByteBuffer;
 import org.apache.commons.codec.digest.HmacUtils;
 
-/**
- * Created by jack on 18/12/16.
- */
 
 public abstract class HotpGenerator extends CodeGenerator {
     private byte[] secret;
@@ -13,10 +10,24 @@ public abstract class HotpGenerator extends CodeGenerator {
 	private int len = 6;
 
 	public enum HashAlgorithm {
-		sha1,
-		sha256,
-		sha384,
-		sha512
+		sha1 (0),
+		sha256 (1),
+		sha384 (2),
+		sha512 (3);
+
+		public final int value;
+		private HashAlgorithm (int value) {
+			this.value = value;
+		}
+
+		public static HashAlgorithm get (int i) {
+			for (HashAlgorithm algo : HashAlgorithm.values()) {
+				if (algo.value == i) {
+					return algo;
+				}
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -28,6 +39,18 @@ public abstract class HotpGenerator extends CodeGenerator {
 		this.secret = secret;
 		this.hashAlgorithm = hashAlgorithm;
 		this.len = length;
+	}
+	public HotpGenerator (String extra) throws CodeGeneratorConstructionException {
+		try {
+			String[] parts = extra.split(",");
+			this.secret = Utils.base32Decode(parts[0]);
+			this.hashAlgorithm = HashAlgorithm.get(Integer.parseInt(parts[1]));
+			this.len = Integer.parseInt(parts[2]);
+		} catch (Base32ParseException e) {
+			throw new CodeGeneratorConstructionException(e.getMessage(), e);
+		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+			throw new CodeGeneratorConstructionException("Extra string was invalid", e);
+		}
 	}
 
 	/**
@@ -61,10 +84,11 @@ public abstract class HotpGenerator extends CodeGenerator {
 		int offset = buff[buff.length - 1] & 0x0F;
 
 		// Take the 4 bytes starting at that offset, and remove the first bit
+		// Working around Java's annoying lack of unsigned types
 		long result = 0;
 		int multiplier = 1;
 		for (int i = 3; i != 0; i--, multiplier *= 256) {
-			result += buff[offset + i] * multiplier;
+			result += (buff[offset + i] & 0xFF) * multiplier;
 		}
 		result += (buff[offset] & 0x7F) * multiplier;
 
@@ -87,4 +111,15 @@ public abstract class HotpGenerator extends CodeGenerator {
 	}
 
 	public abstract String generateCode ();
+
+	/**
+	 * Get the extra data for the DB
+	 * Child classes can override to add more things to the end
+	 *
+	 * @return The data to store in the DB
+	 */
+	@Override
+	public String getExtra () {
+		return String.format("%s,%i,%i", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
+	}
 }

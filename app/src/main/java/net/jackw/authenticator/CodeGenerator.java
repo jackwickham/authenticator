@@ -1,8 +1,25 @@
 package net.jackw.authenticator;
 
-/**
- * Created by jack on 18/12/16.
- */
 
 public abstract class CodeGenerator {
+	public enum Type {
+		TOTP (1),
+		HTOP (2);
+
+		public final int value;
+		private Type(int value) {
+			this.value = value;
+		}
+
+		public static Type get (int i) {
+			for (Type type : Type.values()) {
+				if (type.value == i) {
+					return type;
+				}
+			}
+			return null;
+		}
+	}
+
+	public abstract String getExtra ();
 }
