@@ -6,6 +6,7 @@ public class Account {
 	private String username;
 	private int id;
 	private boolean fromDb = true;
+	private CodeGenerator.Type codeType;
 
 	public Account (CodeGenerator generator, String username, String issuer) {
 		this(generator, username, issuer, 0);
@@ -16,6 +17,8 @@ public class Account {
 		this.username = username;
 		this.issuer = issuer;
 		this.id = id;
+
+		this.codeType = generator.getType();
 	}
 
 	public CodeGenerator getCodeGenerator () {

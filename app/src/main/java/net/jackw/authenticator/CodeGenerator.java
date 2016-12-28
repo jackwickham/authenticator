@@ -22,4 +22,8 @@ public abstract class CodeGenerator {
 	}
 
 	public abstract String getExtra ();
+
+	public abstract Type getType ();
+
+	public abstract String getCodeForDisplay ();
 }

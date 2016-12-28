@@ -2,6 +2,7 @@ package net.jackw.authenticator;
 
 public class CounterHotp extends HotpGenerator {
 	private long counter = 0;
+	private String cachedCode = "------";
 
 	public CounterHotp (byte[] secret, HashAlgorithm hashAlgorithm, int length, long counter) {
 		super(secret, hashAlgorithm, length);
@@ -28,5 +29,16 @@ public class CounterHotp extends HotpGenerator {
 		String result = super.getExtra();
 		result += "," + Long.toString(counter);
 		return result;
+	}
+
+	@Override
+	public Type getType () {
+		return Type.HOTP;
+	}
+
+	@Override
+	public String getCodeForDisplay () {
+		// Will display ------ if uninitialised, or the last generated code if available
+		return cachedCode;
 	}
 }

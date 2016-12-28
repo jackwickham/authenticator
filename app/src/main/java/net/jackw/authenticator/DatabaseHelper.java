@@ -155,8 +155,8 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 
 			// debugging
 			try {
-				accounts.add(constructAccount(1, "Acme, Inc", "SuperCoolUsername", CodeGenerator.Type.TOTP, "JBSWY3DPEHPK3PXP,1,6"));
-				accounts.add(constructAccount(2, "An example Company", "myname@gmail.com", CodeGenerator.Type.TOTP, "JBSWY3DTEHPK3PXP,1,6"));
+				accounts.add(constructAccount(1, "Acme, Inc", "SuperCoolUsername", CodeGenerator.Type.TOTP, "JBSWY3DPEHPK3PXP,1,6,30"));
+				accounts.add(constructAccount(2, "An example Company with a very long name", "myname@gmail.com", CodeGenerator.Type.TOTP, "JBSWY3DTEHPK3PXP,1,6,30"));
 			} catch (CodeGeneratorConstructionException e) {}
 
 			return accounts;
