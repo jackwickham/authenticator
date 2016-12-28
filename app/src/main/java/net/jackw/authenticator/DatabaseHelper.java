@@ -106,7 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				case TOTP:
 					gen = new Totp(extra);
 					break;
-				case HTOP:
+				case HOTP:
 					gen = new CounterHotp(extra);
 					break;
 				default:

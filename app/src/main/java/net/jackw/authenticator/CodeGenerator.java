@@ -4,7 +4,7 @@ package net.jackw.authenticator;
 public abstract class CodeGenerator {
 	public enum Type {
 		TOTP (1),
-		HTOP (2);
+		HOTP (2);
 
 		public final int value;
 		private Type(int value) {

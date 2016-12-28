@@ -98,7 +98,7 @@ public abstract class HotpGenerator extends CodeGenerator {
 	/**
 	 * Generate code for the user to enter
 	 * @param seed The seed to hash from, either counter or time
-	 * @return The HTOP code for the user to enter
+	 * @return The HOTP code for the user to enter
 	 */
 	protected final String generateHotp (long seed) {
 		// Generate the code
