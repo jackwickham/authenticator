@@ -32,7 +32,5 @@
         android:layout_height="match_parent"
         android:id="@+id/account_list"
         android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/account_row_spacing"
-        android:paddingTop="@dimen/account_margin_vertical"
-        android:paddingBottom="@dimen/account_margin_vertical"/>
+        android:dividerHeight="@dimen/account_row_spacing"/>
 </RelativeLayout>

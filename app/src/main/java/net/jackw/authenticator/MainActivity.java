@@ -97,14 +97,26 @@ public class MainActivity extends AppCompatActivity {
 
             TextView codeView = (TextView) row.findViewById(R.id.code);
             TextView labelView = (TextView) row.findViewById(R.id.code_label);
+            CountdownIndicator countdown = (CountdownIndicator) row.findViewById(R.id.countdown_indicator);
 
             String code = account.getCodeGenerator().getCodeForDisplay();
 
-            if (account.getCodeGenerator().getType() == CodeGenerator.Type.TOTP) {
+            CodeGenerator.Type type = account.getCodeGenerator().getType();
+            if (type == CodeGenerator.Type.TOTP) {
                 float timeRemaining = ((Totp) account.getCodeGenerator()).getTimeRemainingFraction();
-                CountdownIndicator countdown = (CountdownIndicator) row.findViewById(R.id.countdown_indicator);
 
+                countdown.setVisibility(View.VISIBLE);
                 countdown.setPhase(timeRemaining);
+            } else if (type == CodeGenerator.Type.HOTP) {
+                countdown.setVisibility(View.GONE);
+            }
+
+            ImageView imageView = (ImageView) row.findViewById(R.id.account_image);
+            if (account.hasImage()) {
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageBitmap(account.getImage());
+            } else {
+                imageView.setVisibility(View.GONE);
             }
 
             // Set the code
