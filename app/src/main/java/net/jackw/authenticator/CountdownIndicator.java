@@ -8,12 +8,12 @@ import android.view.View;
 
 
 public class CountdownIndicator extends View {
-	private float phase;
-	private Paint paintOuter;
-	private Paint paintInner;
+	private float phase = 0.7f;
+	private Paint paint;
 	private Path clipPath;
 	private float centerX;
 	private float centerY;
+	private RectF drawArea;
 
 	public CountdownIndicator (Context context) {
 		this(context, null);
@@ -22,13 +22,11 @@ public class CountdownIndicator extends View {
 	public CountdownIndicator (Context context, AttributeSet attrs) {
 		super(context, attrs);
 
-		this.paintOuter = new Paint(Paint.ANTI_ALIAS_FLAG);
-		this.paintInner = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-		paintInner.setColor(ContextCompat.getColor(context, R.color.account_background));
-		paintOuter.setColor(ContextCompat.getColor(context, R.color.colorAccent));
+		this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint.setColor(ContextCompat.getColor(context, R.color.colorAccent));
 
 		clipPath = new Path();
+		generateClip();
 	}
 
 	public void setPhase (float phase) {
@@ -36,21 +34,20 @@ public class CountdownIndicator extends View {
 			throw new IllegalArgumentException("phase must be between 0 and 1");
 		}
 		this.phase = phase;
+		generateClip();
 	}
 
 	@Override
 	public void onMeasure (int widthAvailable, int heightAvailable) {
 		int dim = Math.min(widthAvailable, heightAvailable);
 		setMeasuredDimension(dim, dim);
+		generateClip();
 	}
 
 	@Override
 	public void onDraw (Canvas canvas) {
-		generateClip();
 		canvas.clipPath(clipPath);
-		canvas.drawRGB(0, 0, 0);
-		RectF drawArea = new RectF(0, 0, getWidth(), getHeight());
-		canvas.drawOval(drawArea, paintOuter);
+		canvas.drawOval(drawArea, paint);
 
 	}
 
@@ -59,11 +56,11 @@ public class CountdownIndicator extends View {
 	 * Based on http://stackoverflow.com/a/22568222/2826188
 	 */
 	private void generateClip () {
-		float angle = 360 - phase * 360;
+		float angle = -(360 - phase * 360);
 		clipPath.reset();
 		calcCenter();
 
-		RectF drawArea = new RectF(0, 0, getWidth(), getHeight());
+		drawArea = new RectF(0, 0, getWidth(), getHeight());
 
 		clipPath.moveTo(centerX, centerY);
 		clipPath.addArc(drawArea, 270.0f, angle);
