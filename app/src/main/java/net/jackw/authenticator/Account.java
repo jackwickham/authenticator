@@ -12,23 +12,18 @@ public class Account {
 	private String issuer;
 	private String username;
 	private int id;
-	private boolean fromDb = true;
-	private CodeGenerator.Type codeType;
 	private boolean hasImage = false;
 	private Bitmap image = null;
 	private Context context = null;
 
 	public Account (CodeGenerator generator, String username, String issuer) {
 		this(generator, username, issuer, 0);
-		this.fromDb = false;
 	}
 	public Account (CodeGenerator generator, String username, String issuer, int id) {
 		this.codeGenerator = generator;
 		this.username = username;
 		this.issuer = issuer;
 		this.id = id;
-
-		this.codeType = generator.getType();
 	}
 
 	public CodeGenerator getCodeGenerator () {
@@ -39,6 +34,13 @@ public class Account {
 	}
 	public String getUsername () {
 		return username;
+	}
+	public int getId () {
+		return id;
+	}
+
+	public void setId (int id) {
+		this.id = id;
 	}
 
 	//<editor-fold desc="Image helper functions">
@@ -75,4 +77,8 @@ public class Account {
 		return "account_image_" + Integer.toString(this.id);
 	}
 	//</editor-fold>
+
+	public void save () {
+		DatabaseHelper.instance().getAccountsDb().saveAccount(this);
+	}
 }

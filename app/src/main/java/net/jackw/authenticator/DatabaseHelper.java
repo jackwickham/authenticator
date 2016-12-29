@@ -1,5 +1,6 @@
 package net.jackw.authenticator;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
@@ -8,6 +9,7 @@ import android.provider.BaseColumns;
 import java.util.*;
 
 public class DatabaseHelper extends SQLiteOpenHelper  {
+	private Context context;
 	/**
 	 * Database data
 	 */
@@ -28,6 +30,8 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 
 		tables = new TableHelper[1];
 		tables[0] = accountsDb = new AccountsDb(this);
+
+		this.context = context;
 	}
 
 	/**
@@ -43,6 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 	public static DatabaseHelper init (Context context) {
 		if (instance == null) {
 			instance = new DatabaseHelper(context);
+		} else {
+			instance.context = context;
 		}
 		return instance;
 	}
@@ -77,11 +83,13 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		public static final String COLUMN_NAME_USERNAME = "username";
 		public static final String COLUMN_NAME_TYPE = "type";
 		public static final String COLUMN_NAME_EXTRA = "extra"; // Store the secret, or anything else needed by the method
+		public static final String COLUMN_NAME_IMAGE = "image";
 
 		private static final String SQL_CREATE_TABLE = String.format(
 				"CREATE TABLE IF NOT EXISTS %s" +
-				"(%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT)",
-			TABLE_NAME, _ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA
+				"(%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER)",
+			TABLE_NAME, _ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE,
+			COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE
 		);
 		private static final String SQL_DESTROY_TABLE = String.format(
 				"DROP TABLE IF EXISTS %s",
@@ -95,6 +103,9 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 
 		private AccountsDb (DatabaseHelper dbHelper) {
 			this.dbHelper = dbHelper;
+
+			/*dbHelper.getWritableDatabase().execSQL(SQL_DESTROY_TABLE);
+			dbHelper.getWritableDatabase().execSQL(SQL_CREATE_TABLE);*/
 		}
 
 		/**
@@ -123,7 +134,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		 */
 		public List<Account> getAllAccounts () {
 			// Construct the query
-			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA};
+			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE};
 			Cursor cursor = this.dbHelper.getReadableDatabase().query(
 					TABLE_NAME,
 					cols,
@@ -143,9 +154,13 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 						cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_TYPE))
 				);
 				String extra = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXTRA));
+				boolean image = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_IMAGE)) == 1;
 
 				try {
-					accounts.add(constructAccount(id, issuer, username, type, extra));
+					Account account = constructAccount(id, issuer, username, type, extra);
+					account.hasImage(image, dbHelper.context);
+
+					accounts.add(account);
 				} catch (CodeGeneratorConstructionException e) {
 					// todo: log this, alert the user, or something
 					continue;
@@ -170,7 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		 */
 		public Account getAccount (int id) {
 			// Construct the query
-			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA};
+			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE};
 			Cursor cursor = this.dbHelper.getReadableDatabase().query(
 					TABLE_NAME,
 					cols,
@@ -188,9 +203,12 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 						cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_TYPE))
 				);
 				String extra = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXTRA));
+				boolean image = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_IMAGE)) == 1;
 
 				try {
 					Account account = constructAccount(id, issuer, username, type, extra);
+					account.hasImage(image, dbHelper.context);
+
 					cursor.close();
 					return account;
 				} catch (CodeGeneratorConstructionException e) {
@@ -201,6 +219,45 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 			cursor.close();
 
 			throw new NoResultsException();
+		}
+
+		/**
+		 * Save an account to the DB
+		 */
+		public void saveAccount (Account account) {
+			if (account.getId() == 0) {
+				// Doesn's currently exist in the DB
+				// Create the values to save
+				ContentValues values = new ContentValues(5);
+				values.put(COLUMN_NAME_ISSUER, account.getIssuer());
+				values.put(COLUMN_NAME_USERNAME, account.getUsername());
+				values.put(COLUMN_NAME_TYPE, account.getCodeGenerator().getType().value);
+				values.put(COLUMN_NAME_EXTRA, account.getCodeGenerator().getExtra());
+				values.put(COLUMN_NAME_IMAGE, account.hasImage());
+
+				// Run the query
+				int id = (int) dbHelper.getWritableDatabase().insertOrThrow(TABLE_NAME, null, values);
+
+				account.setId(id);
+			} else {
+				// Create the values to save
+				ContentValues values = new ContentValues(5);
+				values.put(COLUMN_NAME_ISSUER, account.getIssuer());
+				values.put(COLUMN_NAME_USERNAME, account.getUsername());
+				values.put(COLUMN_NAME_TYPE, account.getCodeGenerator().getType().value);
+				values.put(COLUMN_NAME_EXTRA, account.getCodeGenerator().getExtra());
+				values.put(COLUMN_NAME_IMAGE, account.hasImage());
+
+				// Run the query
+				int changed = dbHelper.getWritableDatabase().update(
+						TABLE_NAME, values, _ID + "=?",
+						new String[]{ Integer.toString(account.getId()) }
+				);
+
+				if (BuildConfig.DEBUG && changed != 1) {
+					throw new AssertionError("Incorrect number of rows changed: " + Integer.toString(changed));
+				}
+			}
 		}
 
 		/**

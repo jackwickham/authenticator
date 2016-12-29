@@ -120,6 +120,6 @@ public abstract class HotpGenerator extends CodeGenerator {
 	 */
 	@Override
 	public String getExtra () {
-		return String.format("%s,%i,%i", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
+		return String.format("%s,%d,%d", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
 	}
 }
