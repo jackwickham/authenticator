@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             // Set the label
             String label = account.getIssuer() + " (" + account.getUsername() + ")";
             Spannable labelSpan = new SpannableString(label);
-            labelSpan.setSpan(new ForegroundColorSpan(getColor(R.color.label_username)), account.getIssuer().length(), label.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            labelSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(MainActivity.this, R.color.label_username)), account.getIssuer().length(), label.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
             labelView.setText(labelSpan, TextView.BufferType.SPANNABLE);
 
