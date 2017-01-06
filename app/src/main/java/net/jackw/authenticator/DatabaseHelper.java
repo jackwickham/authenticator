@@ -5,10 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.*;
 
 public class DatabaseHelper extends SQLiteOpenHelper  {
+	private static final String LOG_TAG = "Database";
+
 	private Context context;
 	/**
 	 * Database data
@@ -26,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 	 * Private constructor for singleton use
 	 */
 	private DatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, 1);
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 		tables = new TableHelper[1];
 		tables[0] = accountsDb = new AccountsDb(this);
@@ -105,8 +108,6 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		private AccountsDb (DatabaseHelper dbHelper) {
 			this.dbHelper = dbHelper;
 
-			/*dbHelper.getWritableDatabase().execSQL(SQL_DESTROY_TABLE);
-			dbHelper.getWritableDatabase().execSQL(SQL_CREATE_TABLE);*/
 		}
 
 		/**
@@ -165,6 +166,8 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 					accounts.add(account);
 				} catch (CodeGeneratorConstructionException e) {
 					// todo: log this, alert the user, or something
+					Log.w(DatabaseHelper.LOG_TAG, e);
+
 					continue;
 				}
 			}
