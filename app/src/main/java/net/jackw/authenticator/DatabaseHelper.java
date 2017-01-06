@@ -84,12 +84,13 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		public static final String COLUMN_NAME_TYPE = "type";
 		public static final String COLUMN_NAME_EXTRA = "extra"; // Store the secret, or anything else needed by the method
 		public static final String COLUMN_NAME_IMAGE = "image";
+		public static final String COLUMN_NAME_POS = "position";
 
 		private static final String SQL_CREATE_TABLE = String.format(
 				"CREATE TABLE IF NOT EXISTS %s" +
-				"(%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER)",
+				"(%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER DEFAULT 0, %s INTEGER)",
 			TABLE_NAME, _ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE,
-			COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE
+			COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE, COLUMN_NAME_POS
 		);
 		private static final String SQL_DESTROY_TABLE = String.format(
 				"DROP TABLE IF EXISTS %s",
@@ -111,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		/**
 		 * Now for actually useful methods
 		 */
-		private Account constructAccount (int id, String issuer, String username, CodeGenerator.Type type, String extra) throws CodeGeneratorConstructionException {
+		private Account constructAccount (int id, String issuer, String username, CodeGenerator.Type type, String extra, Integer pos) throws CodeGeneratorConstructionException {
 			CodeGenerator gen;
 			switch (type) {
 				case TOTP:
@@ -123,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				default:
 					throw new CodeGeneratorConstructionException("Invalid type");
 			}
-			Account account = new Account(gen, username, issuer, id);
+			Account account = new Account(gen, username, issuer, id, pos);
 
 			return account;
 		}
@@ -134,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		 */
 		public List<Account> getAllAccounts () {
 			// Construct the query
-			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE};
+			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE, COLUMN_NAME_POS};
 			Cursor cursor = this.dbHelper.getReadableDatabase().query(
 					TABLE_NAME,
 					cols,
@@ -155,9 +156,10 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				);
 				String extra = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXTRA));
 				boolean image = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_IMAGE)) == 1;
+				int pos = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_POS));
 
 				try {
-					Account account = constructAccount(id, issuer, username, type, extra);
+					Account account = constructAccount(id, issuer, username, type, extra, pos);
 					account.hasImage(image, dbHelper.context);
 
 					accounts.add(account);
@@ -167,12 +169,6 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				}
 			}
 			cursor.close();
-
-			// debugging
-			try {
-				accounts.add(constructAccount(1, "Acme, Inc", "SuperCoolUsername", CodeGenerator.Type.TOTP, "JBSWY3DPEHPK3PXP,1,6,30"));
-				accounts.add(constructAccount(2, "An example Company with a very long name", "myname@gmail.com", CodeGenerator.Type.TOTP, "JBSWY3DTEHPK3PXP,1,6,30"));
-			} catch (CodeGeneratorConstructionException e) {}
 
 			return accounts;
 		}
@@ -185,7 +181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		 */
 		public Account getAccount (int id) {
 			// Construct the query
-			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE};
+			String[] cols = {_ID, COLUMN_NAME_ISSUER, COLUMN_NAME_USERNAME, COLUMN_NAME_TYPE, COLUMN_NAME_EXTRA, COLUMN_NAME_IMAGE, COLUMN_NAME_POS};
 			Cursor cursor = this.dbHelper.getReadableDatabase().query(
 					TABLE_NAME,
 					cols,
@@ -193,7 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 					new String[]{Integer.toString(id)},
 					null,
 					null,
-					_ID + " DESC"
+					COLUMN_NAME_POS + " DESC"
 			);
 			// Run it and process the results
 			while(cursor.moveToNext()) {
@@ -204,9 +200,10 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				);
 				String extra = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXTRA));
 				boolean image = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_IMAGE)) == 1;
+				int pos = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_POS));
 
 				try {
-					Account account = constructAccount(id, issuer, username, type, extra);
+					Account account = constructAccount(id, issuer, username, type, extra, pos);
 					account.hasImage(image, dbHelper.context);
 
 					cursor.close();
@@ -225,8 +222,28 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 		 * Save an account to the DB
 		 */
 		public void saveAccount (Account account) {
+			Integer pos = account.getPos();
+			if (pos == null) {
+				Cursor cursor = this.dbHelper.getReadableDatabase().query(
+						TABLE_NAME,
+						new String[]{String.format("MAX(%s) AS maxPos", COLUMN_NAME_POS)},
+						null,
+						null,
+						null,
+						null,
+						null
+				);
+				try {
+					cursor.moveToFirst();
+					pos = cursor.getInt(cursor.getColumnIndexOrThrow("maxPos")) + 1;
+					account.setPos(pos);
+				} finally {
+					cursor.close();
+				}
+			}
+
 			if (account.getId() == 0) {
-				// Doesn's currently exist in the DB
+				// Doesn't currently exist in the DB
 				// Create the values to save
 				ContentValues values = new ContentValues(5);
 				values.put(COLUMN_NAME_ISSUER, account.getIssuer());
@@ -234,6 +251,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				values.put(COLUMN_NAME_TYPE, account.getCodeGenerator().getType().value);
 				values.put(COLUMN_NAME_EXTRA, account.getCodeGenerator().getExtra());
 				values.put(COLUMN_NAME_IMAGE, account.hasImage());
+				values.put(COLUMN_NAME_POS, pos);
 
 				// Run the query
 				int id = (int) dbHelper.getWritableDatabase().insertOrThrow(TABLE_NAME, null, values);
@@ -247,6 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 				values.put(COLUMN_NAME_TYPE, account.getCodeGenerator().getType().value);
 				values.put(COLUMN_NAME_EXTRA, account.getCodeGenerator().getExtra());
 				values.put(COLUMN_NAME_IMAGE, account.hasImage());
+				values.put(COLUMN_NAME_POS, pos);
 
 				// Run the query
 				int changed = dbHelper.getWritableDatabase().update(

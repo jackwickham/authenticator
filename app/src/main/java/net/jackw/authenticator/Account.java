@@ -14,16 +14,18 @@ public class Account {
 	private int id;
 	private boolean hasImage = false;
 	private Bitmap image = null;
+	private Integer pos = null;
 	private Context context = null;
 
 	public Account (CodeGenerator generator, String username, String issuer) {
-		this(generator, username, issuer, 0);
+		this(generator, username, issuer, 0, null);
 	}
-	public Account (CodeGenerator generator, String username, String issuer, int id) {
+	public Account (CodeGenerator generator, String username, String issuer, int id, Integer pos) {
 		this.codeGenerator = generator;
 		this.username = username;
 		this.issuer = issuer;
 		this.id = id;
+		this.pos = pos;
 	}
 
 	public CodeGenerator getCodeGenerator () {
@@ -38,9 +40,19 @@ public class Account {
 	public int getId () {
 		return id;
 	}
+	public Integer getPos () {
+		return pos;
+	}
 
 	public void setId (int id) {
 		this.id = id;
+	}
+	public void setPos (int pos) {
+		// null can't be used as arg because the index must always exist
+		if (pos <= 0) {
+			throw new IllegalArgumentException("Pos must be a positive integer");
+		}
+		this.pos = pos;
 	}
 
 	//<editor-fold desc="Image helper functions">
