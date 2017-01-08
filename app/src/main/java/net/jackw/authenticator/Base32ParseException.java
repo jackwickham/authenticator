@@ -1,6 +1,6 @@
 package net.jackw.authenticator;
 
-public class Base32ParseException extends Exception {
+public class Base32ParseException extends RuntimeException {
 	public Base32ParseException(String message) {
 		super(message);
 	}

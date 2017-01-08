@@ -34,13 +34,9 @@ public class AccountAddManual extends Fragment {
 	private TextInputEditText secretInput;
 	private TextInputEditText issuerInput;
 	private TextInputEditText usernameInput;
-	private TextInputLayout secretContainer;
-	private TextInputLayout issuerContainer;
-	private TextInputLayout usernameContainer;
-	// And their validity
-	private InputState secretState = InputState.UNINITIALISED;
-	private InputState issuerState = InputState.UNINITIALISED;
-	private InputState usernameState = InputState.VALID; // optional so valid by default
+	private ValidatableTextInputLayout secretContainer;
+	private ValidatableTextInputLayout issuerContainer;
+	private ValidatableTextInputLayout usernameContainer;
 
 	private byte[] secret;
 
@@ -94,9 +90,9 @@ public class AccountAddManual extends Fragment {
 		secretInput = (TextInputEditText) view.findViewById(R.id.input_secret);
 		issuerInput = (TextInputEditText) view.findViewById(R.id.input_issuer);
 		usernameInput = (TextInputEditText) view.findViewById(R.id.input_user);
-		secretContainer = (TextInputLayout) view.findViewById(R.id.input_secret_container);
-		issuerContainer = (TextInputLayout) view.findViewById(R.id.input_issuer_container);
-		usernameContainer = (TextInputLayout) view.findViewById(R.id.input_user_container);
+		secretContainer = (ValidatableTextInputLayout) view.findViewById(R.id.input_secret_container);
+		issuerContainer = (ValidatableTextInputLayout) view.findViewById(R.id.input_issuer_container);
+		usernameContainer = (ValidatableTextInputLayout) view.findViewById(R.id.input_user_container);
 
 		setUpInputListeners();
 
@@ -125,102 +121,25 @@ public class AccountAddManual extends Fragment {
 	}
 
 	public boolean validateForm () {
-		boolean valid = true;
-		if (secretState != InputState.VALID) {
-			valid = false;
-			if (secretState == InputState.UNINITIALISED) {
-				secretContainer.setError(getResources().getString(R.string.account_manual_secret_required));
-			}
-		}
-		if (issuerState != InputState.VALID) {
-			valid = false;
-			if (issuerState == InputState.UNINITIALISED) {
-				issuerContainer.setError(getResources().getString(R.string.account_manual_issuer_required));
-			}
-		}
-		if (usernameState != InputState.VALID) {
-			valid = false;
-		}
-		return valid;
+		// Note: bitwise ampersand to prevent shortcircuiting - we want to run all validations
+		return secretContainer.isValid() & issuerContainer.isValid() & usernameContainer.isValid();
 	}
 
 	private void setUpInputListeners () {
-		// Secret is required and must be valid
-		secretInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+		// Secret
+		secretContainer.addValidator(new InputValidator() {
+			@Nullable
 			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus) {
-					if (secretInput.getText().toString().trim().length() == 0) {
-						secretState = InputState.EMPTY;
-						secretContainer.setError(getResources().getString(R.string.account_manual_secret_required));
-					} else if (getSecret(true) == null) {
-						secretState = InputState.INVALID;
-						secretContainer.setError(getResources().getString(R.string.account_manual_secret_invalid));
-					} else {
-						secretState = InputState.VALID;
-						secretContainer.setErrorEnabled(false);
-					}
+			public String validate(String value) {
+				try {
+					secret = Utils.base32Decode(value);
+				} catch (Base32ParseException e) {
+					return getResources().getString(R.string.account_manual_secret_invalid);
 				}
+				// Valid
+				return null;
 			}
 		});
-		secretInput.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				// Hide the error message
-				secretContainer.setErrorEnabled(false);
-			}
-		});
-
-		// issuer is required
-		issuerInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus) {
-					if (issuerInput.getText().toString().trim().length() == 0) {
-						issuerState = InputState.EMPTY;
-						issuerContainer.setError(getResources().getString(R.string.account_manual_issuer_required));
-					} else {
-						issuerState = InputState.VALID;
-						issuerContainer.setErrorEnabled(false);
-					}
-				}
-			}
-		});
-		issuerInput.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				// Hide the error message
-				issuerContainer.setErrorEnabled(false);
-			}
-		});
-	}
-
-	@Nullable
-	private byte[] getSecret () {
-		return getSecret(false);
-	}
-	@Nullable
-	private byte[] getSecret (boolean forceUpdate) {
-		if (forceUpdate) {
-			try {
-				secret = Utils.base32Decode(secretInput.getText().toString().trim());
-			} catch (Base32ParseException e) {
-				secret = null;
-			}
-		}
-		return secret;
 	}
 
 
@@ -247,17 +166,6 @@ public class AccountAddManual extends Fragment {
 	}
 
 	/**
-	 * Input state enum
-	 */
-	private enum InputState {
-		UNINITIALISED,
-		EMPTY,
-		INVALID,
-		VALID,
-		DISABLED
-	}
-
-	/**
 	 * Submit button handler
 	 */
 	private class SubmitButtonHandler implements View.OnClickListener {
@@ -266,7 +174,7 @@ public class AccountAddManual extends Fragment {
 			if (!validateForm()) {
 				return;
 			}
-			byte[] secret = getSecret();
+			byte[] secret = Utils.base32Decode(secretInput.getText().toString().trim());
 			String issuer = issuerInput.getText().toString();
 			String username = usernameInput.getText().toString();
 			if (username.equals("")) {
