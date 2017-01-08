@@ -18,7 +18,7 @@ import android.widget.Button;
  * Use the {@link AccountAddQr#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountAddQr extends Fragment {
+public class AccountAddQr extends BaseFragment {
 
 	private OnFragmentInteractionListener mListener;
 
@@ -52,23 +52,18 @@ public class AccountAddQr extends Fragment {
 		Button otherMethodsButton = (Button) view.findViewById(R.id.add_other_button);
 		otherMethodsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick (View v) {
-				mListener.onOtherMethodPress();
+				if (mListener != null) {
+					mListener.onOtherMethodPress();
+				}
 			}
 		});
 
 		return view;
 	}
 
-	// TODO: Rename method, update argument and hook method into UI event
-	public void onButtonPressed(Uri uri) {
-		if (mListener != null) {
-			mListener.onFragmentInteraction(uri);
-		}
-	}
 
 	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
+	protected void attachContext (Context context) {
 		if (context instanceof OnFragmentInteractionListener) {
 			mListener = (OnFragmentInteractionListener) context;
 		} else {

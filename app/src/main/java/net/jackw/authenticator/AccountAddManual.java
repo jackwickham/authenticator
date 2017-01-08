@@ -5,9 +5,6 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +20,7 @@ import android.widget.*;
  * Use the {@link AccountAddManual#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountAddManual extends Fragment {
+public class AccountAddManual extends BaseFragment {
 	private final String LOG_TAG = "AccountAddManualFragment";
 
 	private AccountAddListener mListener;
@@ -104,8 +101,7 @@ public class AccountAddManual extends Fragment {
 	}
 
 	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
+	protected void attachContext(Context context) {
 		if (context instanceof AccountAddListener) {
 			mListener = (AccountAddListener) context;
 		} else {
