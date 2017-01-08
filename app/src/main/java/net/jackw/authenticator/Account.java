@@ -3,11 +3,12 @@ package net.jackw.authenticator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class Account {
+public class Account implements Comparable<Account> {
 	private CodeGenerator codeGenerator;
 	private String issuer;
 	private String username;
@@ -92,5 +93,10 @@ public class Account {
 
 	public void save () {
 		DatabaseHelper.instance().getAccountsDb().saveAccount(this);
+	}
+
+	@Override
+	public int compareTo (@NonNull Account other) {
+		return -pos.compareTo(other.pos);
 	}
 }

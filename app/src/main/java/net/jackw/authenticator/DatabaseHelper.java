@@ -144,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 					null,
 					null,
 					null,
-					_ID + " DESC"
+					_ID + " ASC"
 			);
 			// Run it and process the results
 			List<Account> accounts = new ArrayList<>(cursor.getCount());
