@@ -10,10 +10,10 @@ public abstract class HotpGenerator extends CodeGenerator {
 	private int len = 6;
 
 	public enum HashAlgorithm {
-		sha1 (0),
-		sha256 (1),
-		sha384 (2),
-		sha512 (3);
+		SHA1(0),
+		SHA256(1),
+		SHA384(2),
+		SHA512(3);
 
 		public final int value;
 		private HashAlgorithm (int value) {
@@ -30,15 +30,29 @@ public abstract class HotpGenerator extends CodeGenerator {
 		}
 	}
 
+	private static final HashAlgorithm DEFAULT_ALGORITHM = HashAlgorithm.SHA1;
+	private static final int DEFAULT_LENGTH = 6;
+
 	/**
 	 * Precomputed powers of 10 for performance
 	 */
 	private final int[] POWERS_OF_TEN = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
 
+	/**
+	 * Construct using default options
+	 */
+	public HotpGenerator (byte[] secret) {
+		this (secret, DEFAULT_ALGORITHM, DEFAULT_LENGTH);
+	}
+
 	public HotpGenerator (byte[] secret, HashAlgorithm hashAlgorithm, int length) {
 		this.secret = secret;
 		this.hashAlgorithm = hashAlgorithm;
 		this.len = length;
+
+		if (length < 3 || length > 10) {
+			throw new IllegalArgumentException("length must be in the range 3 - 10");
+		}
 	}
 	public HotpGenerator (String extra) throws CodeGeneratorConstructionException {
 		try {
@@ -64,16 +78,16 @@ public abstract class HotpGenerator extends CodeGenerator {
 
 		// HMAC
 		switch (hashAlgorithm) {
-			case sha1:
+			case SHA1:
 				buff = HmacUtils.hmacSha1(secret, buff);
 				break;
-			case sha256:
+			case SHA256:
 				buff = HmacUtils.hmacSha256(secret, buff);
 				break;
-			case sha384:
+			case SHA384:
 				buff = HmacUtils.hmacSha384(secret, buff);
 				break;
-			case sha512:
+			case SHA512:
 				buff = HmacUtils.hmacSha512(secret, buff);
 				break;
 			default:
@@ -121,5 +135,13 @@ public abstract class HotpGenerator extends CodeGenerator {
 	@Override
 	public String getExtra () {
 		return String.format("%s,%d,%d", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
+	}
+
+	public void setLength (int length) {
+		this.len = length;
+	}
+
+	public void setAlgorithm (HashAlgorithm algorithm) {
+		this.hashAlgorithm = algorithm;
 	}
 }

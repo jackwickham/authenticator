@@ -6,8 +6,20 @@ public class Totp extends HotpGenerator {
 	private String cachedCode;
 	private long cachedSeed = 0;
 
+	private static final int DEFAULT_INTERVAL = 30;
+
+	public Totp (byte[] secret) {
+		super(secret);
+
+		this.interval = DEFAULT_INTERVAL;
+	}
+
 	public Totp (byte[] secret, HashAlgorithm hashAlgorithm, int length, int interval) {
 		super(secret, hashAlgorithm, length);
+
+		if (interval < 10 || interval > 180) {
+			throw new IllegalArgumentException("Interval must be between 10 and 180 seconds");
+		}
 
 		this.interval = interval;
 	}
@@ -46,11 +58,16 @@ public class Totp extends HotpGenerator {
 		// Check if the code needs regenerating
 		if (cachedSeed != TimeProvider.getInstance().now() / (interval * 1000)) {
 			cachedCode = generateCode();
+			cachedSeed = TimeProvider.getInstance().now() / (interval * 1000);
 		}
 		return cachedCode;
 	}
 
 	public float getTimeRemainingFraction () {
 		return (TimeProvider.getInstance().now() % (interval * 1000)) / (interval * 1000.0f);
+	}
+
+	public void setInterval (int interval) {
+		this.interval = interval;
 	}
 }
