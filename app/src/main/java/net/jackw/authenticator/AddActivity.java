@@ -8,23 +8,30 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
-public class AddActivity extends AppCompatActivity implements AccountAddListener, AccountAddQr.OnFragmentInteractionListener {
+import java.util.HashMap;
+
+public class AddActivity extends AppCompatActivity implements AccountAddListener {
+	private Fragment methodFragment;
+	private AddMethod methodFragmentType;
+	private Bundle savedInstance = null;
+
+	private HashMap<AddMethod, Fragment> fragmentCache = new HashMap<>(2);
+
+	private final AddMethod DEFAULT_METHOD = AddMethod.Manual;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add);
 
+		// Try to restore state
+		if (savedInstanceState == null) {
+			setupMethodFragment(DEFAULT_METHOD, false);
+		}
+
 		setupActionBar();
-		setupMainFragment();
-	}
-
-	@Override
-	public void onFragmentInteraction(Uri uri) {
-
 	}
 
 	private void setupActionBar() {
@@ -35,13 +42,34 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		}
 	}
 
-	private void setupMainFragment () {
+	private void setupMethodFragment (AddMethod type, boolean addToBackStack) {
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-		Fragment otherMethodsFragment = new AccountAddQr();
+		String tag = "accountMethod_" + type.name;
 
-		fragmentTransaction.replace(R.id.account_add_frag, otherMethodsFragment);
+		if (methodFragment != null) {
+			fragmentTransaction.hide(methodFragment);
+		}
+
+		methodFragment = fragmentManager.findFragmentByTag(tag);
+		if (methodFragment == null) {
+			switch (type) {
+				case QR:
+					methodFragment = new AccountAddQr();
+					break;
+				case Manual:
+					methodFragment = new AccountAddManual();
+					break;
+			}
+			fragmentTransaction.add(R.id.account_add_frag, methodFragment, "accountMethod_" + type.name);
+		} else {
+			fragmentTransaction.show(methodFragment);
+		}
+
+		if (addToBackStack) {
+			fragmentTransaction.addToBackStack(null);
+		}
 
 		fragmentTransaction.commit();
 	}
@@ -63,18 +91,8 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onOtherMethodPress () {
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-		Fragment otherMethodsFragment = new AccountAddManual();
-
-		fragmentTransaction.replace(R.id.account_add_frag, otherMethodsFragment);
-
-		fragmentTransaction.addToBackStack(null);
-
-		fragmentTransaction.commit();
+	public void onSwitchMethodPress (AddMethod method) {
+		setupMethodFragment(method, true);
 	}
 
 	@Override
@@ -125,5 +143,38 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		// Inform the main activity that we added an account, and return to it
 		setResult(RESULT_OK);
 		finish();
+	}
+
+	@Override
+	public void onSaveInstanceState (Bundle outState) {
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onRestoreInstanceState (Bundle savedInstance) {
+		// Everything has to be handled in onCreate instead
+		super.onRestoreInstanceState(savedInstance);
+	}
+
+
+	public enum AddMethod {
+		QR (1, "qr"),
+		Manual (2, "manual");
+
+		public final int value;
+		public final String name;
+		private AddMethod(int value, String name) {
+			this.value = value;
+			this.name = name;
+		}
+
+		public static AddMethod get (int i) {
+			for (AddMethod type : AddMethod.values()) {
+				if (type.value == i) {
+					return type;
+				}
+			}
+			return null;
+		}
 	}
 }
