@@ -99,6 +99,20 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
+	public void onSaveInstanceState (Bundle outState) {
+		// Actually, no state to persist I think
+
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onRestoreInstanceState (Bundle savedInstanceState) {
+		// Nothing to do here either
+
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_CODE_ADD_ACCOUNT:

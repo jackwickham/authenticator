@@ -18,9 +18,9 @@ import android.widget.Button;
  * Use the {@link AccountAddQr#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountAddQr extends BaseFragment {
+public class AccountAddQr extends AccountAddFragment {
 
-	private OnFragmentInteractionListener mListener;
+	private AccountAddListener mListener;
 
 	public AccountAddQr() {
 		// Required empty public constructor
@@ -49,23 +49,14 @@ public class AccountAddQr extends BaseFragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_account_add_qr, container, false);
 
-		Button otherMethodsButton = (Button) view.findViewById(R.id.add_other_button);
-		otherMethodsButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick (View v) {
-				if (mListener != null) {
-					mListener.onOtherMethodPress();
-				}
-			}
-		});
-
 		return view;
 	}
 
 
 	@Override
 	protected void attachContext (Context context) {
-		if (context instanceof OnFragmentInteractionListener) {
-			mListener = (OnFragmentInteractionListener) context;
+		if (context instanceof AccountAddListener) {
+			mListener = (AccountAddListener) context;
 		} else {
 			throw new RuntimeException(context.toString()
 					+ " must implement OnFragmentInteractionListener");
@@ -78,21 +69,9 @@ public class AccountAddQr extends BaseFragment {
 		mListener = null;
 	}
 
-	/**
-	 * This interface must be implemented by activities that contain this
-	 * fragment to allow an interaction in this fragment to be communicated
-	 * to the activity and potentially other fragments contained in that
-	 * activity.
-	 * <p>
-	 * See the Android Training lesson <a href=
-	 * "http://developer.android.com/training/basics/fragments/communicating.html"
-	 * >Communicating with Other Fragments</a> for more information.
-	 */
-	public interface OnFragmentInteractionListener {
-		// TODO: Update argument type and name
-		void onFragmentInteraction(Uri uri);
-
-		void onOtherMethodPress ();
+	@Override
+	public AddActivity.AddMethod getType () {
+		return AddActivity.AddMethod.QR;
 	}
 
 

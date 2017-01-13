@@ -20,7 +20,7 @@ import android.widget.*;
  * Use the {@link AccountAddManual#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountAddManual extends BaseFragment {
+public class AccountAddManual extends AccountAddFragment {
 	private final String LOG_TAG = "AccountAddManualFragment";
 
 	private AccountAddListener mListener;
@@ -189,5 +189,11 @@ public class AccountAddManual extends BaseFragment {
 				Log.wtf(LOG_TAG, e);
 			}
 		}
+	}
+
+
+	@Override
+	public AddActivity.AddMethod getType () {
+		return AddActivity.AddMethod.Manual;
 	}
 }

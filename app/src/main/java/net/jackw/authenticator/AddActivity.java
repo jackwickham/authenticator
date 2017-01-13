@@ -9,29 +9,56 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.HashMap;
 
 public class AddActivity extends AppCompatActivity implements AccountAddListener {
-	private Fragment methodFragment;
-	private AddMethod methodFragmentType;
-	private Bundle savedInstance = null;
-
 	private HashMap<AddMethod, Fragment> fragmentCache = new HashMap<>(2);
 
 	private final AddMethod DEFAULT_METHOD = AddMethod.Manual;
+
+	private Button switchMethodButton = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add);
 
+		switchMethodButton = (Button) findViewById(R.id.add_other_button);
+		switchMethodButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick (View v) {
+				AccountAddFragment fragment = (AccountAddFragment) getFragmentManager().findFragmentByTag("accountMethod");
+				AddMethod method;
+				if (fragment instanceof AccountAddQr) {
+					method = AddMethod.Manual;
+				} else if (fragment instanceof AccountAddManual){
+					method = AddMethod.QR;
+				} else {
+					throw new IllegalStateException("Unknown fragment type");
+				}
+
+				setupMethodFragment(method, true);
+			}
+		});
+
+		setupActionBar();
+
 		// Try to restore state
 		if (savedInstanceState == null) {
 			setupMethodFragment(DEFAULT_METHOD, false);
+		} else {
+			setSwitchButtonText();
 		}
 
-		setupActionBar();
+		// Add listener to change the button text when the back stack changes
+		getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+			@Override
+			public void onBackStackChanged() {
+				setSwitchButtonText();
+			}
+		});
 	}
 
 	private void setupActionBar() {
@@ -46,32 +73,52 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-		String tag = "accountMethod_" + type.name;
-
-		if (methodFragment != null) {
-			fragmentTransaction.hide(methodFragment);
+		AccountAddFragment methodFragment = null;
+		switch (type) {
+			case QR:
+				methodFragment = new AccountAddQr();
+				break;
+			case Manual:
+				methodFragment = new AccountAddManual();
+				break;
 		}
-
-		methodFragment = fragmentManager.findFragmentByTag(tag);
-		if (methodFragment == null) {
-			switch (type) {
-				case QR:
-					methodFragment = new AccountAddQr();
-					break;
-				case Manual:
-					methodFragment = new AccountAddManual();
-					break;
-			}
-			fragmentTransaction.add(R.id.account_add_frag, methodFragment, "accountMethod_" + type.name);
-		} else {
-			fragmentTransaction.show(methodFragment);
-		}
+		fragmentTransaction.replace(R.id.account_add_frag, methodFragment, "accountMethod");
 
 		if (addToBackStack) {
 			fragmentTransaction.addToBackStack(null);
 		}
 
 		fragmentTransaction.commit();
+
+		// Change the button text
+		setSwitchButtonText(type);
+	}
+
+	private void setSwitchButtonText (AddMethod currentType) {
+		int stringId = 0;
+		switch(currentType) {
+			case Manual:
+				stringId = R.string.add_method_qr;
+				break;
+			case QR:
+				stringId = R.string.add_method_manual;
+				break;
+		}
+		switchMethodButton.setText(stringId);
+	}
+
+	private void setSwitchButtonText () {
+		AccountAddFragment fragment = (AccountAddFragment) getFragmentManager().findFragmentByTag("accountMethod");
+		AddMethod method;
+		if (fragment instanceof AccountAddQr) {
+			method = AddMethod.QR;
+		} else if (fragment instanceof AccountAddManual){
+			method = AddMethod.Manual;
+		} else {
+			throw new IllegalStateException("Unknown fragment type");
+		}
+
+		setSwitchButtonText(method);
 	}
 
 	@Override
@@ -89,10 +136,6 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		}
 
 		return super.onOptionsItemSelected(item);
-	}
-
-	public void onSwitchMethodPress (AddMethod method) {
-		setupMethodFragment(method, true);
 	}
 
 	@Override
@@ -177,4 +220,5 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 			return null;
 		}
 	}
+
 }
