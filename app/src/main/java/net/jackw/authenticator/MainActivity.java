@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
+		// Init time provider
+		TimeProvider.getInstance(this);
+
 		// Initialise the list
 		ListView accountList = (ListView) findViewById(R.id.account_list);
 		listAdapter = new AccountListAdapter(this, R.layout.account_row);
@@ -68,7 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
 		switch (id) {
 			case R.id.action_settings:
-				return true;
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+				break;
 			case R.id.action_add:
 				startAddAccount();
 				return true;

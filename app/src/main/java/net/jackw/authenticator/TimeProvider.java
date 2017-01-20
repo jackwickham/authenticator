@@ -4,10 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-/**
- * Created by jack on 19/12/16.
- */
-
 public class TimeProvider {
 	private static TimeProvider instance = null;
 
@@ -18,8 +14,7 @@ public class TimeProvider {
 	}
 
 	public TimeProvider (Context context) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		timeOffset = sharedPreferences.getInt("timeOffset", 0);
+		setOffsetFromPref(context);
 
 		instance = this;
 	}
@@ -32,18 +27,26 @@ public class TimeProvider {
 		return instance;
 	}
 
-
-	public long now () {
-		return System.currentTimeMillis() + timeOffset;
+	public static TimeProvider getInstance (Context context) {
+		if (instance == null) {
+			instance = new TimeProvider(context);
+		} else {
+			instance.setOffsetFromPref(context);
+		}
+		return instance;
 	}
 
-	public void updateOffset (int offset, Context context) {
+
+	public long now () {
+		return System.currentTimeMillis() + timeOffset*1000;
+	}
+
+	public void updateOffset (int offset) {
 		timeOffset = offset;
+	}
 
+	private void setOffsetFromPref (Context context) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-
-		editor.putInt("timeOffset", offset);
-		editor.apply();
+		timeOffset = sharedPreferences.getInt("timeOffset", 0);
 	}
 }

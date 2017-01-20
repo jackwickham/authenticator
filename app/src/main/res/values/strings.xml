@@ -1,6 +1,7 @@
 <resources>
 	<string name="app_name">Authenticator</string>
 	<string name="action_settings">Settings</string>
+	<string name="title_activity_settings">Settings</string>
 	<string name="action_add">Add Account</string>
 	<string name="add_method_manual">Enter a key</string>
 	<string name="add_method_qr">Scan a QR code</string>
@@ -18,4 +19,8 @@
 	<string name="account_type_hotp">Counter-based</string>
 
 	<string name="validate_too_short">At least %d characters are required</string>
+
+
+	<!-- Strings related to Settings -->
+	<string name="pref_title_time_offset">Time Correction (seconds)</string>
 </resources>

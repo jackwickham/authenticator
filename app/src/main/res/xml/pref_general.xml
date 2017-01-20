@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<net.jackw.authenticator.EditNumberPreference
+		android:defaultValue="0"
+		android:inputType="numberSigned"
+		android:key="timeOffset"
+		android:maxLines="1"
+		android:selectAllOnFocus="true"
+		android:singleLine="true"
+		android:title="@string/pref_title_time_offset"/>
+
+</PreferenceScreen>
