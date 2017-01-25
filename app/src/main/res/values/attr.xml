@@ -3,5 +3,6 @@
 	<declare-styleable name="ValidatableTextInputLayout">
 		<attr name="required" format="boolean" />
 		<attr name="minLength" format="integer" />
+		<attr name="requiredText" format="string" />
 	</declare-styleable>
 </resources>

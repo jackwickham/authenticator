@@ -16,6 +16,7 @@ import java.util.LinkedList;
 public class ValidatableTextInputLayout extends TextInputLayout {
 	private boolean required;
 	private int minLength;
+	private String requiredText;
 
 	private InputState state = InputState.UNINITIALISED;
 	private LinkedList<InputValidator> validators = new LinkedList<>();
@@ -39,6 +40,10 @@ public class ValidatableTextInputLayout extends TextInputLayout {
 		try {
 			required = a.getBoolean(R.styleable.ValidatableTextInputLayout_required, false);
 			minLength = a.getInt(R.styleable.ValidatableTextInputLayout_minLength, 0);
+			requiredText = a.getString(R.styleable.ValidatableTextInputLayout_requiredText);
+			if (requiredText == null) {
+				requiredText = getResources().getString(R.string.validate_required);
+			}
 		} finally {
 			a.recycle();
 		}
@@ -102,7 +107,7 @@ public class ValidatableTextInputLayout extends TextInputLayout {
 	@Nullable
 	private String validate (String value) {
 		if (value.length() < minLength) {
-			return String.format(getResources().getString(R.string.validate_too_short), minLength); //todo
+			return String.format(getResources().getString(R.string.validate_too_short), minLength);
 		}
 		for (InputValidator validator : validators) {
 			String error = validator.validate(value);
@@ -121,7 +126,7 @@ public class ValidatableTextInputLayout extends TextInputLayout {
 		if (value.length() == 0) {
 			state = InputState.EMPTY;
 			if (required) {
-				setError(getResources().getString(R.string.account_manual_secret_required)); //todo
+				setError(requiredText);
 			} else {
 				setErrorEnabled(false);
 			}
