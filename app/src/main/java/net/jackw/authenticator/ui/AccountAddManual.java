@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
+import net.jackw.authenticator.Base32ParseException;
+import net.jackw.authenticator.CodeGenerator;
+import net.jackw.authenticator.R;
+import net.jackw.authenticator.Utils;
 
 
 /**

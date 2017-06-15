@@ -1,10 +1,12 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.content.Context;
 import android.graphics.*;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
+
+import net.jackw.authenticator.R;
 
 
 public class CountdownIndicator extends View {

@@ -1,19 +1,19 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+
+import net.jackw.authenticator.R;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AccountAddQr.OnFragmentInteractionListener} interface
+ * {@link AccountAddListener} interface
  * to handle interaction events.
  * Use the {@link AccountAddQr#newInstance} factory method to
  * create an instance of this fragment.
@@ -58,8 +58,7 @@ public class AccountAddQr extends AccountAddFragment {
 		if (context instanceof AccountAddListener) {
 			mListener = (AccountAddListener) context;
 		} else {
-			throw new RuntimeException(context.toString()
-					+ " must implement OnFragmentInteractionListener");
+			throw new RuntimeException(context.toString() + " must implement AccountAddListener");
 		}
 	}
 

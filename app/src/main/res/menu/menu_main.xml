@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="net.jackw.authenticator.MainActivity">
+    tools:context="net.jackw.authenticator.ui.MainActivity">
     <item
         android:id="@+id/action_add"
         android:orderInCategory="1"

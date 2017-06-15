@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 
 import android.annotation.TargetApi;
@@ -14,6 +14,9 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+
+import net.jackw.authenticator.R;
+import net.jackw.authenticator.TimeProvider;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

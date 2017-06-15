@@ -3,7 +3,7 @@
 			 xmlns:validate="http://schemas.android.com/apk/res-auto"
 			 android:layout_width="match_parent"
 			 android:layout_height="match_parent"
-			 tools:context="net.jackw.authenticator.AccountAddManual">
+			 tools:context="net.jackw.authenticator.ui.AccountAddManual">
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -14,7 +14,7 @@
 		android:paddingLeft="@dimen/activity_horizontal_margin"
 		android:orientation="vertical">
 
-		<net.jackw.authenticator.ValidatableTextInputLayout
+		<net.jackw.authenticator.ui.ValidatableTextInputLayout
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:id="@+id/input_secret_container"
@@ -26,9 +26,9 @@
 				android:layout_height="wrap_content"
 				android:hint="@string/account_manual_secret_hint"
 				android:inputType="textNoSuggestions|textVisiblePassword|textCapCharacters"/>
-		</net.jackw.authenticator.ValidatableTextInputLayout>
+		</net.jackw.authenticator.ui.ValidatableTextInputLayout>
 
-		<net.jackw.authenticator.ValidatableTextInputLayout
+		<net.jackw.authenticator.ui.ValidatableTextInputLayout
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:id="@+id/input_issuer_container"
@@ -39,9 +39,9 @@
 				android:layout_height="wrap_content"
 				android:hint="@string/account_manual_issuer_hint"
 				android:inputType="text|textCapWords"/>
-		</net.jackw.authenticator.ValidatableTextInputLayout>
+		</net.jackw.authenticator.ui.ValidatableTextInputLayout>
 
-		<net.jackw.authenticator.ValidatableTextInputLayout
+		<net.jackw.authenticator.ui.ValidatableTextInputLayout
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:id="@+id/input_user_container">
@@ -51,7 +51,7 @@
 				android:layout_height="wrap_content"
 				android:hint="@string/account_manual_user_hint"
 				android:inputType="text"/>
-		</net.jackw.authenticator.ValidatableTextInputLayout>
+		</net.jackw.authenticator.ui.ValidatableTextInputLayout>
 
 		<Spinner
 			android:id="@+id/input_type"

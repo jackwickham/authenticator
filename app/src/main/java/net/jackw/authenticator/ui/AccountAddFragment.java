@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 /**
  * Created by jack on 13/01/17.

@@ -1,8 +1,7 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.net.Uri;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -11,6 +10,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import net.jackw.authenticator.Account;
+import net.jackw.authenticator.CounterHotp;
+import net.jackw.authenticator.HotpGenerator;
+import net.jackw.authenticator.R;
+import net.jackw.authenticator.Totp;
 
 import java.util.HashMap;
 

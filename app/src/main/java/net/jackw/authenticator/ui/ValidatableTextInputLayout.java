@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.*;
 import android.widget.*;
+
+import net.jackw.authenticator.R;
 
 import java.util.LinkedList;
 

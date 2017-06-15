@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.support.annotation.Nullable;
 

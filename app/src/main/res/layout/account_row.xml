@@ -21,7 +21,7 @@
 			android:textColor="@color/code_text"
 			android:layout_marginRight="@dimen/account_code_margin_right"/>
 
-		<net.jackw.authenticator.CountdownIndicator
+		<net.jackw.authenticator.ui.CountdownIndicator
 			android:id="@+id/countdown_indicator"
 			android:layout_width="30dp"
 			android:layout_height="30dp"

@@ -10,7 +10,7 @@
 	android:paddingRight="0dp"
 	android:paddingTop="0dp"
 	android:orientation="vertical"
-	tools:context="net.jackw.authenticator.AddActivity">
+	tools:context="net.jackw.authenticator.ui.AddActivity">
 	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"

@@ -1,4 +1,4 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +10,15 @@ import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
+
+import net.jackw.authenticator.Account;
+import net.jackw.authenticator.CodeGenerator;
+import net.jackw.authenticator.DatabaseHelper;
+import net.jackw.authenticator.R;
+import net.jackw.authenticator.TimeProvider;
+import net.jackw.authenticator.Totp;
 
 import java.util.*;
 

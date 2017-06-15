@@ -1,6 +1,8 @@
-package net.jackw.authenticator;
+package net.jackw.authenticator.ui;
 
 import android.support.annotation.Nullable;
+
+import net.jackw.authenticator.HotpGenerator;
 
 public interface AccountAddListener {
 	/**

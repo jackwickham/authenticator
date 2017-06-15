@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<net.jackw.authenticator.EditNumberPreference
+	<net.jackw.authenticator.ui.EditNumberPreference
 		android:defaultValue="0"
 		android:inputType="numberSigned"
 		android:key="timeOffset"
