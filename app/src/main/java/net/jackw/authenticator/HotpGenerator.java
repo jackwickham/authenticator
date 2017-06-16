@@ -1,6 +1,8 @@
 package net.jackw.authenticator;
 
 import java.nio.ByteBuffer;
+import java.util.Locale;
+
 import org.apache.commons.codec.digest.HmacUtils;
 
 
@@ -134,7 +136,7 @@ public abstract class HotpGenerator extends CodeGenerator {
 	 */
 	@Override
 	public String getExtra () {
-		return String.format("%s,%d,%d", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
+		return String.format(Locale.UK, "%s,%d,%d", Utils.base32Encode(this.secret, false), hashAlgorithm.value, len);
 	}
 
 	public void setLength (int length) {

@@ -13,7 +13,7 @@
 	<string name="account_manual_submit">Add</string>
 	<string name="account_manual_secret_invalid">That secret doesn\'t work</string>
 	<string name="account_manual_secret_required">A secret is required</string>
-	<string name="account_manual_issuer_required">The site name is required</string>
+	<string name="account_manual_issuer_required">The site name is required to help you identify it</string>
 
 	<string name="account_qr_awaiting_permissions">Waiting for permission to access Camera</string>
 

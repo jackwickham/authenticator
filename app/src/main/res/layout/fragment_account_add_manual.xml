@@ -32,7 +32,8 @@
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:id="@+id/input_issuer_container"
-			validate:required="true">
+			validate:required="true"
+			validate:requiredText="@string/account_manual_issuer_required">
 			<android.support.design.widget.TextInputEditText
 				android:id="@+id/input_issuer"
 				android:layout_width="match_parent"
