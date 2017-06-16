@@ -1,12 +1,13 @@
 package net.jackw.authenticator.ui;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +35,7 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		switchMethodButton = (Button) findViewById(R.id.add_other_button);
 		switchMethodButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick (View v) {
-				AccountAddFragment fragment = (AccountAddFragment) getFragmentManager().findFragmentByTag("accountMethod");
+				AccountAddFragment fragment = (AccountAddFragment) getSupportFragmentManager().findFragmentByTag("accountMethod");
 				AddMethod method;
 				if (fragment instanceof AccountAddQr) {
 					method = AddMethod.Manual;
@@ -58,7 +59,7 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 		}
 
 		// Add listener to change the button text when the back stack changes
-		getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+		getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
 			@Override
 			public void onBackStackChanged() {
 				setSwitchButtonText();
@@ -75,7 +76,7 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 	}
 
 	private void setupMethodFragment (AddMethod type, boolean addToBackStack) {
-		FragmentManager fragmentManager = getFragmentManager();
+		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 		AccountAddFragment methodFragment = null;
@@ -113,7 +114,7 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 	}
 
 	private void setSwitchButtonText () {
-		AccountAddFragment fragment = (AccountAddFragment) getFragmentManager().findFragmentByTag("accountMethod");
+		AccountAddFragment fragment = (AccountAddFragment) getSupportFragmentManager().findFragmentByTag("accountMethod");
 		AddMethod method;
 		if (fragment instanceof AccountAddQr) {
 			method = AddMethod.QR;

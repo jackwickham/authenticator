@@ -68,6 +68,9 @@ public class AccountAddManual extends AccountAddFragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_account_add_manual, container, false);
 
+		// Allow the container to take up as much or as little space as necessary
+		container.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
 		// Set up the type spinner
 		Spinner typeSpinner = (Spinner) view.findViewById(R.id.input_type);
 		GeneratorType[] generatorTypes = {

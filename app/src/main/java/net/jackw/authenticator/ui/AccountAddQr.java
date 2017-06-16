@@ -1,11 +1,19 @@
 package net.jackw.authenticator.ui;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import net.jackw.authenticator.R;
 
@@ -19,8 +27,11 @@ import net.jackw.authenticator.R;
  * create an instance of this fragment.
  */
 public class AccountAddQr extends AccountAddFragment {
+	private static final int PERM_REQ_CAMERA = 1;
 
 	private AccountAddListener mListener;
+	private Camera cam;
+	FrameLayout frame;
 
 	public AccountAddQr() {
 		// Required empty public constructor
@@ -32,7 +43,6 @@ public class AccountAddQr extends AccountAddFragment {
 	 *
 	 * @return A new instance of fragment AccountAddQr.
 	 */
-	// TODO: Rename and change types and number of parameters
 	public static AccountAddQr newInstance() {
 		AccountAddQr fragment = new AccountAddQr();
 		return fragment;
@@ -49,12 +59,46 @@ public class AccountAddQr extends AccountAddFragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_account_add_qr, container, false);
 
+		frame = (FrameLayout) view.findViewById(R.id.camera_preview);
+
+		// Make the container fill the whole page
+		container.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+		if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+			// Request permission
+			requestPermissions(new String[]{Manifest.permission.CAMERA}, PERM_REQ_CAMERA);
+		} else {
+			attachCamera();
+		}
+
 		return view;
+	}
+
+	private Camera getCameraInstance() {
+		if (cam != null) return cam;
+		try {
+			return Camera.open();
+		} catch (RuntimeException e) {
+			// Camera not available
+		}
+
+		// unsupported - todo
+		return null;
+	}
+
+	private void attachCamera() {
+		if (cam == null) {
+			cam = getCameraInstance();
+		}
+		if (cam != null) {
+			CameraFrame preview = new CameraFrame(getActivity(), cam);
+			frame.addView(preview);
+		}
 	}
 
 
 	@Override
-	protected void attachContext (Context context) {
+	protected void attachContext(Context context) {
 		if (context instanceof AccountAddListener) {
 			mListener = (AccountAddListener) context;
 		} else {
@@ -66,12 +110,65 @@ public class AccountAddQr extends AccountAddFragment {
 	public void onDetach() {
 		super.onDetach();
 		mListener = null;
+
+		if (cam != null) {
+			cam.release();
+			cam = null;
+		}
+	}
+
+	/**
+	 * Called when the fragment is visible to the user and actively running.
+	 * This is generally
+	 * tied to {@link Activity#onResume() Activity.onResume} of the containing
+	 * Activity's lifecycle.
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		//cam = getCameraInstance();
+	}
+
+	/**
+	 * Called when the Fragment is no longer resumed.  This is generally
+	 * tied to {@link Activity#onPause() Activity.onPause} of the containing
+	 * Activity's lifecycle.
+	 */
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (cam != null) {
+			cam.release();
+			cam = null;
+		}
+	}
+
+	/**
+	 * Called when the Fragment is no longer started.  This is generally
+	 * tied to {@link Activity#onStop() Activity.onStop} of the containing
+	 * Activity's lifecycle.
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		if (cam != null) {
+			cam.release();
+			cam = null;
+		}
 	}
 
 	@Override
-	public AddActivity.AddMethod getType () {
+	public AddActivity.AddMethod getType() {
 		return AddActivity.AddMethod.QR;
 	}
 
-
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		// \o/
+		if (requestCode == PERM_REQ_CAMERA) {
+			if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				attachCamera();
+			}
+		}
+	}
 }

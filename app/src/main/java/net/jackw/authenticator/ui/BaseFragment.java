@@ -1,7 +1,7 @@
 package net.jackw.authenticator.ui;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Build;
 

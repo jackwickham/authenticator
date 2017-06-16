@@ -2,14 +2,22 @@
 			 xmlns:tools="http://schemas.android.com/tools"
 			 android:layout_width="match_parent"
 			 android:layout_height="match_parent"
-			 tools:context="net.jackw.authenticator.ui.AccountAddQr">
+			 tools:context="net.jackw.authenticator.ui.AccountAddQr"
+			 android:id="@+id/qrRoot"
+	>
 
-	<RelativeLayout
+	<FrameLayout
+		android:id="@+id/camera_preview"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/account_qr_awaiting_permissions"
+				android:padding="15dp"/>
 
 		<!-- TODO: integrate a barcode scanner into the app (https://github.com/zxing/zxing) -->
 
-	</RelativeLayout>
+	</FrameLayout>
 
 </FrameLayout>
