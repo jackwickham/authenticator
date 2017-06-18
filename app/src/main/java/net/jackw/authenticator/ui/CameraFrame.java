@@ -139,8 +139,5 @@ public class CameraFrame extends SurfaceView implements SurfaceHolder.Callback {
 		}
 		Log.d(LOG_TAG, Integer.toString(context.getWindowManager().getDefaultDisplay().getRotation()));
 		camera.setDisplayOrientation(orientation);
-
-		Camera.Parameters params = camera.getParameters();
-		params.setPreviewSize(getWidth(), getHeight() / 2);
 	}
 }

@@ -2,6 +2,7 @@ package net.jackw.authenticator.ui;
 
 import android.support.annotation.Nullable;
 
+import net.jackw.authenticator.Account;
 import net.jackw.authenticator.HotpGenerator;
 
 public interface AccountAddListener {
@@ -30,4 +31,6 @@ public interface AccountAddListener {
 	 */
 	void addHotpAccount (byte[] secret, String issuer, @Nullable String username, @Nullable Integer digits,
 						 @Nullable Long counter, @Nullable HotpGenerator.HashAlgorithm algorithm);
+
+	void addAccount (Account account);
 }

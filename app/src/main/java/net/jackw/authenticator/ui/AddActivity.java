@@ -195,6 +195,14 @@ public class AddActivity extends AppCompatActivity implements AccountAddListener
 	}
 
 	@Override
+	public void addAccount (Account account) {
+		account.save();
+
+		setResult(RESULT_OK);
+		finish();
+	}
+
+	@Override
 	public void onSaveInstanceState (Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
